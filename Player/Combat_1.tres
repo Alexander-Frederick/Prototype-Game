@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="CombatConfig" load_steps=2 format=3 uid="uid://cssevk6aggck4"]
+
+[ext_resource type="Script" uid="uid://bl6a5ybhujy8q" path="res://Combat/CombatConfig.gd" id="1_knfba"]
+
+[resource]
+script = ExtResource("1_knfba")
+sword_range = 100.0
+metadata/_custom_type_script = "uid://bl6a5ybhujy8q"

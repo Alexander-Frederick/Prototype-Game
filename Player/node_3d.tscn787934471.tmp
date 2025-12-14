@@ -1,0 +1,32 @@
+[gd_scene load_steps=7 format=3 uid="uid://fp2lbbmda2nr"]
+
+[ext_resource type="Script" uid="uid://c4w663e4j8hd1" path="res://Player/Player_Combat.gd" id="1_n5rmy"]
+[ext_resource type="Script" uid="uid://bl6a5ybhujy8q" path="res://Combat/CombatConfig.gd" id="2_qa1ss"]
+[ext_resource type="Script" uid="uid://bk8ahlkd7urqj" path="res://Player/rings.gd" id="3_cp6r7"]
+
+[sub_resource type="Resource" id="Resource_cp6r7"]
+script = ExtResource("2_qa1ss")
+metadata/_custom_type_script = "uid://bl6a5ybhujy8q"
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_qa1ss"]
+
+[sub_resource type="Resource" id="Resource_hpcmt"]
+script = ExtResource("2_qa1ss")
+metadata/_custom_type_script = "uid://bl6a5ybhujy8q"
+
+[node name="Node3D" type="Node3D"]
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." node_paths=PackedStringArray("camera")]
+script = ExtResource("1_n5rmy")
+config = SubResource("Resource_cp6r7")
+camera = NodePath("Camera3D")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
+shape = SubResource("SphereShape3D_qa1ss")
+
+[node name="Camera3D" type="Camera3D" parent="CharacterBody3D"]
+
+[node name="Rings" type="Node" parent="CharacterBody3D" node_paths=PackedStringArray("player")]
+script = ExtResource("3_cp6r7")
+config = SubResource("Resource_hpcmt")
+player = NodePath("..")
