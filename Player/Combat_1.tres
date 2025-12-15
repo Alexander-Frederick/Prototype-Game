@@ -4,5 +4,8 @@
 
 [resource]
 script = ExtResource("1_knfba")
+sword_damage = 2
 sword_range = 100.0
+ring1_cooldown_sec = 0.0
+ring2_cooldown_sec = 0.0
 metadata/_custom_type_script = "uid://bl6a5ybhujy8q"

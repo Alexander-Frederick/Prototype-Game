@@ -8,12 +8,16 @@
 
 [sub_resource type="Resource" id="Resource_cp6r7"]
 script = ExtResource("2_qa1ss")
+ring1_cooldown_sec = 0.0
+ring2_cooldown_sec = 0.0
 metadata/_custom_type_script = "uid://bl6a5ybhujy8q"
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_qa1ss"]
 
 [sub_resource type="Resource" id="Resource_hpcmt"]
 script = ExtResource("2_qa1ss")
+ring1_cooldown_sec = 0.0
+ring2_cooldown_sec = 0.0
 metadata/_custom_type_script = "uid://bl6a5ybhujy8q"
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_hpcmt"]

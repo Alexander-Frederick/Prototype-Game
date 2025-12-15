@@ -17,7 +17,7 @@ func apply_damage(amount: int, source: Node = null) -> bool:
 
 	if hp == 0:
 		print("Sandbag died.")
-		queue_free()
+		self.get_parent().queue_free()
 		return true
 
 	return false

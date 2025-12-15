@@ -13,8 +13,14 @@ var health: int
 var shields: int
 
 var _attack_cd_left := 0.0
+var _attack_lockout_left := 0.0
 var _is_blocking := false
 var _block_started_time := -999.0
+
+var _block_buffer_left := 0.0
+
+var _shield_regen_delay_left := 0.0
+var _shield_regen_accum := 0.0
 
 func _ready() -> void:
 	health = config.max_health
@@ -23,26 +29,60 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_attack_cd_left = max(_attack_cd_left - delta, 0.0)
+	_attack_lockout_left = max(_attack_lockout_left - delta, 0.0)
+	_block_buffer_left = max(_block_buffer_left - delta, 0.0)
+
+	# Shield regen (wait a short delay after taking damage, then regen back to max)
+	if shields < config.max_shields:
+		_shield_regen_delay_left = max(_shield_regen_delay_left - delta, 0.0)
+		if _shield_regen_delay_left <= 0.0 and config.shield_regen_per_sec > 0.0:
+			_shield_regen_accum += config.shield_regen_per_sec * delta
+			var add: int = int(floor(_shield_regen_accum))
+			if add > 0:
+				_shield_regen_accum -= float(add)
+				var old := shields
+				shields = mini(shields + add, config.max_shields)
+				if shields != old:
+					shields_changed.emit(shields, config.max_shields)
+	else:
+		# When full, keep timers clean.
+		_shield_regen_delay_left = 0.0
+		_shield_regen_accum = 0.0
 
 	if Input.is_action_just_pressed("attack"):
 		try_attack()
 
 	if Input.is_action_pressed("block"):
 		if not _is_blocking:
-			_start_block()
+			# Do not allow block to start during the attack lockout.
+			# Buffer the input so block can start shortly after.
+			if _is_attacking():
+				_block_buffer_left = maxf(_block_buffer_left, config.block_input_buffer_sec)
+			else:
+				_start_block()
 	else:
 		if _is_blocking:
 			_stop_block()
+		_block_buffer_left = 0.0
+
+	# If block was pressed during an attack, start it as soon as we are allowed.
+	if not _is_blocking and _block_buffer_left > 0.0 and not _is_attacking() and Input.is_action_pressed("block"):
+		_start_block()
+		_block_buffer_left = 0.0
 
 	# Temporary test so you can validate block/perfect timing without enemy AI.
 	if Input.is_action_just_pressed("debug_take_damage"):
 		receive_incoming_damage(config.test_incoming_damage)
 
 func try_attack() -> void:
+	# No attacking while blocking.
+	if _is_blocking:
+		return
 	if _attack_cd_left > 0.0:
 		return
 
 	_attack_cd_left = config.sword_cooldown_sec
+	_attack_lockout_left = maxf(config.attack_block_lockout_sec, 0.0)
 
 	var target := _ray_pick_damageable(config.sword_range)
 	if target == null:
@@ -117,6 +157,7 @@ func receive_incoming_damage(amount: int) -> void:
 		# Blocking consumes shields if available; otherwise health.
 		if shields > 0:
 			shields = max(shields - config.block_shield_damage_per_hit, 0)
+			_reset_shield_regen_timer()
 			shields_changed.emit(shields, config.max_shields)
 			return
 		# No shields left -> take health damage
@@ -128,8 +169,17 @@ func receive_incoming_damage(amount: int) -> void:
 
 func _take_health_damage(amount: int) -> void:
 	health = max(health - amount, 0)
+	_reset_shield_regen_timer()
 	player_damaged.emit(amount)
 	health_changed.emit(health, config.max_health)
+
+func _reset_shield_regen_timer() -> void:
+	# Whenever we take damage (blocked or not), postpone regen.
+	_shield_regen_delay_left = maxf(config.shield_regen_delay_sec, 0.0)
+	_shield_regen_accum = 0.0
+
+func _is_attacking() -> bool:
+	return _attack_lockout_left > 0.0
 
 func _emit_resource_signals() -> void:
 	health_changed.emit(health, config.max_health)

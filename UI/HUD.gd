@@ -43,7 +43,6 @@ func _ready() -> void:
 
 	_update_rings_ui()
 
-
 func _process(_delta: float) -> void:
 	_update_rings_ui()
 
@@ -161,11 +160,17 @@ func _update_rings_ui() -> void:
 	_r1_charge_label.text = "Charge: %d / %d" % [r1_charge, r1_req]
 
 	# Ring 1 cooldown
-	var r1_cd_total: float = maxf(float(rings.get_ring1_cd_total()), 0.001)
+	var r1_cd_total: float = float(rings.get_ring1_cd_total())
 	var r1_cd_left: float = float(rings.get_ring1_cd_left())
-	_r1_cd_bar.max_value = r1_cd_total
-	_r1_cd_bar.value = clampf(r1_cd_total - r1_cd_left, 0.0, r1_cd_total)
-	_r1_cd_label.text = "Cooldown: %.1fs" % r1_cd_left
+	if r1_cd_total <= 0.0:
+		_r1_cd_bar.max_value = 1.0
+		_r1_cd_bar.value = 1.0
+		_r1_cd_label.text = "Cooldown: none"
+	else:
+		var total := maxf(r1_cd_total, 0.001)
+		_r1_cd_bar.max_value = total
+		_r1_cd_bar.value = clampf(total - r1_cd_left, 0.0, total)
+		_r1_cd_label.text = "Cooldown: %.1fs" % r1_cd_left
 
 	# Ring 2 charge
 	var r2_req: int = int(rings.get_ring2_charge_required())
@@ -175,12 +180,20 @@ func _update_rings_ui() -> void:
 	_r2_charge_label.text = "Charge: %d / %d" % [r2_charge, r2_req]
 
 	# Ring 2 cooldown / active
-	var r2_cd_total: float = maxf(float(rings.get_ring2_cd_total()), 0.001)
+	var r2_cd_total: float = float(rings.get_ring2_cd_total())
 	var r2_cd_left: float = float(rings.get_ring2_cd_left())
-	_r2_cd_bar.max_value = r2_cd_total
-	_r2_cd_bar.value = clampf(r2_cd_total - r2_cd_left, 0.0, r2_cd_total)
+	if r2_cd_total <= 0.0:
+		_r2_cd_bar.max_value = 1.0
+		_r2_cd_bar.value = 1.0
+	else:
+		var total2 := maxf(r2_cd_total, 0.001)
+		_r2_cd_bar.max_value = total2
+		_r2_cd_bar.value = clampf(total2 - r2_cd_left, 0.0, total2)
 
 	if rings.is_ring2_active():
 		_r2_cd_label.text = "Active: %.1fs" % float(rings.get_ring2_time_left())
 	else:
-		_r2_cd_label.text = "Cooldown: %.1fs" % r2_cd_left
+		if r2_cd_total <= 0.0:
+			_r2_cd_label.text = "Cooldown: none"
+		else:
+			_r2_cd_label.text = "Cooldown: %.1fs" % r2_cd_left
