@@ -82,3 +82,35 @@ func _start_time_slow() -> void:
 func _end_time_slow() -> void:
 	_ring2_active = false
 	Engine.time_scale = 1.0
+
+# rings.gd (append to the bottom)
+
+func get_ring1_charge() -> int:
+	return _ring1_charge
+
+func get_ring2_charge() -> int:
+	return _ring2_charge
+
+func get_ring1_charge_required() -> int:
+	return config.ring1_charge_required
+
+func get_ring2_charge_required() -> int:
+	return config.ring2_charge_required
+
+func get_ring1_cd_left() -> float:
+	return _ring1_cd
+
+func get_ring2_cd_left() -> float:
+	return _ring2_cd
+
+func get_ring1_cd_total() -> float:
+	return config.ring1_cooldown_sec
+
+func get_ring2_cd_total() -> float:
+	return config.ring2_cooldown_sec
+
+func is_ring2_active() -> bool:
+	return _ring2_active
+
+func get_ring2_time_left() -> float:
+	return _ring2_left
