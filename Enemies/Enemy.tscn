@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://dxbk4hglmuabd"]
+
+[ext_resource type="Script" uid="uid://d008m1s8x23et" path="res://Enemies/Enemy.gd" id="1_bkvnc"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_bkvnc"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_4isyn"]
+
+[node name="Node3D" type="CharacterBody3D"]
+script = ExtResource("1_bkvnc")
+attack_cooldown_sec = 3.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_bkvnc")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_4isyn")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]

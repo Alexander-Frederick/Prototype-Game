@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://br746q0smmgvg"]
+
+[ext_resource type="Script" uid="uid://uqfm6ta4ygy1" path="res://Enemies/sandbag.gd" id="1_ibq52"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_hpcmt"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_0u33a"]
+
+[node name="Sandbag" type="MeshInstance3D"]
+mesh = SubResource("CapsuleMesh_hpcmt")
+
+[node name="MeshInstance3D" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.8586652)
+script = ExtResource("1_ibq52")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.8718759)
+shape = SubResource("CapsuleShape3D_0u33a")

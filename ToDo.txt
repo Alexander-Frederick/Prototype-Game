@@ -1,0 +1,2 @@
+Next up is to create animations that make it more obvious when an enemy is attacking
+Same with player's blocking

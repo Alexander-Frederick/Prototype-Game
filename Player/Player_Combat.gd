@@ -9,6 +9,11 @@ signal health_changed(current: int, max: int)
 @export var config: CombatConfig
 @export var camera: Camera3D
 
+@export_category("Animations")
+@export var anim_player: AnimationPlayer
+@export var anim_attack: StringName = &"attack"
+@export var anim_block: StringName = &"block"
+
 var health: int
 var shields: int
 
@@ -23,8 +28,14 @@ var _shield_regen_delay_left := 0.0
 var _shield_regen_accum := 0.0
 
 func _ready() -> void:
+	add_to_group("player")
 	health = config.max_health
 	shields = config.max_shields
+
+	# Auto-find AnimationPlayer if not assigned in inspector
+	if anim_player == null:
+		anim_player = get_node_or_null("AnimationPlayer") as AnimationPlayer
+
 	_emit_resource_signals()
 
 func _process(delta: float) -> void:
@@ -80,6 +91,10 @@ func try_attack() -> void:
 		return
 	if _attack_cd_left > 0.0:
 		return
+
+	# Animation hook: attack
+	if anim_player != null and anim_player.has_animation(anim_attack):
+		anim_player.play(anim_attack)
 
 	_attack_cd_left = config.sword_cooldown_sec
 	_attack_lockout_left = maxf(config.attack_block_lockout_sec, 0.0)
@@ -138,8 +153,16 @@ func _start_block() -> void:
 	_is_blocking = true
 	_block_started_time = Time.get_ticks_msec() / 1000.0
 
+	# Animation hook: block
+	if anim_player != null and anim_player.has_animation(anim_block):
+		anim_player.play(anim_block)
+
 func _stop_block() -> void:
 	_is_blocking = false
+
+	# Optional: stop only if we are currently playing the block animation
+	if anim_player != null and anim_player.is_playing() and anim_player.current_animation == String(anim_block):
+		anim_player.stop()
 
 func receive_incoming_damage(amount: int) -> void:
 	if amount <= 0:
